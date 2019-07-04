@@ -10,7 +10,7 @@
                         <span
                             class="date" style="text-align: left">{{ .Date.Format (.Site.Params.dateFormat | default "January 2, 2006" ) }}</span>
                     </a>
-                    <p>{{ .Summary }}</p>
+                    <p>{{ .Params.abstract }}</p>
                     <p>{{ partial "tags-list.html" . }}</p>
                 </header>
             </article>

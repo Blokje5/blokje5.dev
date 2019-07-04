@@ -1,0 +1,6 @@
+[build]
+publish = "public"
+command = "hugo --baseURL $URL"
+
+[context.deploy-preview]
+command = "hugo --buildFuture --baseURL $DEPLOY_PRIME_URL"

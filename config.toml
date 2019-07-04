@@ -1,8 +1,9 @@
-baseurl = "http://www.example.com"
+baseurl = "http://localhost:1313"
 title = "blokje5.dev"
 theme = "hugo-coder"
 languagecode = "en"
 defaultcontentlanguage = "en"
+canonifyurls = true
 
 [permalinks]
   blog = "/:filename/"
@@ -15,7 +16,7 @@ defaultcontentlanguage = "en"
     hidecredits = false
     hidecopyright = false
     rtl = false
-    math = true
+    math = false
 
 [[params.social]]
     name = "Github"
