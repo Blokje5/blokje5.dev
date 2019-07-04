@@ -1,0 +1,21 @@
+<li>
+    <div class="container">
+        <content>
+            <article>
+                <header>
+                    <a href="{{ .Params.ExternalLink | default .RelPermalink }}">
+                        <div class="post-title">
+                            <h1>{{ .Title }}</h1>
+                        </div>
+                        <span
+                            class="date" style="text-align: left">{{ .Date.Format (.Site.Params.dateFormat | default "January 2, 2006" ) }}</span>
+                    </a>
+                    <p>{{ .Summary }}</p>
+                    <p>{{ partial "tags-list.html" . }}</p>
+                </header>
+            </article>
+        </content>
+
+    </div>
+    <hr />
+</li>

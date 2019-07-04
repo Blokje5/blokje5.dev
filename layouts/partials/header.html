@@ -1,0 +1,24 @@
+<nav class="navigation">
+    <section class="container">
+      <a class="navigation-title" href="{{ .Site.BaseURL | absLangURL }}">
+        {{ .Site.Title }}
+      </a>
+      {{ with .Site.Params.social }}
+      <ul class="navigation-list centered">
+          {{ range sort .}}
+          {{ if .icon }}
+          <li class="navigation-item menu-separator">
+              <a href="{{ .url }}" aria-label="{{ .name }}" {{ if .rel }}rel="{{ .rel }}" {{ end }}>
+                  <i class="{{ .icon }}" aria-hidden="true"></i>
+              </a>
+          </li>
+          {{ else }}
+          <li>
+              <a href="{{ .url }}" aria-label="{{ .name }}" {{ if .rel }}rel="{{ .rel }}" {{ end }}>{{ .name }}</a>
+          </li>
+          {{ end }}
+          {{ end }}
+      </ul>
+      {{ end }}
+    </section>
+  </nav>

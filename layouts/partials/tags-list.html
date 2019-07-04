@@ -1,0 +1,10 @@
+{{ $taxo := "tags" }} <!-- Use the plural form here -->
+{{ with .Param $taxo }}
+    <strong>Tag{{ if gt (len .) 1 }}s{{ end }}:</strong>
+    {{ range $index, $tag := . }}
+        {{- if gt $index 0 }}, {{ end -}}
+        {{ with $.Site.GetPage (printf "/%s/%s" $taxo $tag) -}}
+            <a href="{{ .Permalink }}">{{ $tag }}</a>
+        {{- end -}}
+    {{- end -}}
+{{ end }}

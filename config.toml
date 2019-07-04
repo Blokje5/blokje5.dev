@@ -1,0 +1,39 @@
+baseurl = "http://www.example.com"
+title = "blokje5.dev"
+theme = "hugo-coder"
+languagecode = "en"
+defaultcontentlanguage = "en"
+
+[permalinks]
+  blog = "/:filename/"
+
+[params]
+    author = "Lennard Eijsackers"
+    info = "Data Engineer"
+    description = "Lennard Eijsackers developer blog"
+    keywords = "blog,developer,personal"
+    hidecredits = false
+    hidecopyright = false
+    rtl = false
+    math = true
+
+[[params.social]]
+    name = "Github"
+    icon = "fab fa-github fa-2x"
+    weight = 1
+    url = "https://github.com/Blokje5/"
+[[params.social]]
+    name = "Twitter"
+    icon = "fab fa-twitter fa-2x"
+    weight = 3
+    url = "https://twitter.com/LennardNL/"
+[[params.social]]
+    name = "Stackoverflow"
+    icon = "fab fa-stack-overflow fa-2x"
+    weight = 3
+    url = "https://stackoverflow.com/users/9741769/blokje5/"
+[[params.social]]
+    name = "Linkedin"
+    icon = "fab fa-linkedin fa-2x"
+    weight = 3
+    url = "https://www.linkedin.com/in/lennard-eijsackers/"

@@ -1,0 +1,14 @@
+{{ define "title" }}
+  {{ .Title }} · {{ .Site.Title }}
+{{ end }}
+{{ define "content" }}
+  <section class="container list">
+    <ul>
+      {{- range .Paginator.Pages -}}
+        {{ partial "list-item.html" . }}
+      {{- end -}}
+    </ul>
+
+    {{ partial "pagination.html" . }}
+  </section>
+{{ end }}
