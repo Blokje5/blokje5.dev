@@ -198,3 +198,5 @@ The two `deny` rules use [incremental rule definitions](https://www.openpolicyag
 ## Conclusion
 
 Hopefully you have seen what can be achieved with the Open Policy Agent. It is a really powerful tool for policy evaluation that can be used in multiple places in your architecture to evaluate compliance policies. Although it takes some time to get used to writing Rego policies due to its declarative nature, it is a really powerful language that lets you focus on what you want to achieve, instead of focusing on how to achieve it. And once you know how to write Rego policies, you can apply them across the entire stack!
+
+You can find the code for this blog post on [github](https://github.com/Blokje5/validating-terraform-with-conftest)
