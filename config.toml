@@ -1,4 +1,4 @@
-baseurl = "http://localhost:1313"
+baseurl = "https://www.blokje5.dev"
 title = "blokje5.dev"
 theme = "hugo-coder"
 languagecode = "en"
