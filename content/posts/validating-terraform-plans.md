@@ -134,10 +134,13 @@ package tags_validation
 
 minimum_tags = {"ApplicationRole", "Owner", "Project"}
 
-tags_valid_pascal_case(tags) {
-    val := tags[key]
-    re_match(`^([A-Z][a-z0-9]+)+`, key)
-    re_match(`^([A-Z][a-z0-9]+)+`, val)
+key_val_valid_pascal_case(key, val) {
+    is_pascal_case(key)
+    is_pascal_case(val)
+}
+
+is_pascal_case(string) {
+    re_match(`^([A-Z][a-z0-9]+)+`, string)
 }
 
 tags_contain_proper_keys(tags) {
@@ -145,10 +148,9 @@ tags_contain_proper_keys(tags) {
     leftover := minimum_tags - keys
     leftover == set()
 }
-
 ```
 
-We define two functions here: `tags_valid_pascal_case` validates wether the keys and values are proper pascal case, `tags_contain_proper_keys` validates wether the tags contain atleast the minumum set of tags: ApplicationRole, Owner and Project. Note that we are using a [set comprehension](https://www.openpolicyagent.org/docs/latest/how-do-i-write-policies/#set-comprehensions) to generate a set of keys after which we use set operations to check if the tags contain the minimum set.
+We define three functions here: `key_val_valid_pascal_case` validates wether the keys and values are proper pascal case, `is_pascal_case` is a helper function that determines wether a string is pascal case. `tags_contain_proper_keys` validates wether the tags contain atleast the minumum set of tags: ApplicationRole, Owner and Project. Note that we are using a [set comprehension](https://www.openpolicyagent.org/docs/latest/how-do-i-write-policies/#set-comprehensions) to generate a set of keys after which we use set operations to check if the tags contain the minimum set.
 
 Now that we have the functions in place to validate the tags, we can write the actual rules. Ideally our rules also contain some information on which resources where affected and which rule they broke:
 
@@ -165,7 +167,7 @@ module_address[i] = address {
 tags_pascal_case[i] = resources {
     changeset := input.resource_changes[i]
     tags  := changeset.change.after.tags
-    resources := [resource | resource := module_address[i]; not tags_validation.tags_valid_pascal_case(changeset.change.after.tags)]
+    resources := [resource | resource := module_address[i]; val := tags[key]; not tags_validation.key_val_valid_pascal_case(key, val)]
 }
 
 tags_contain_minimum_set[i] = resources {
