@@ -5,6 +5,10 @@ languagecode = "en"
 defaultcontentlanguage = "en"
 canonifyurls = true
 
+pygmentsstyle = "solarized-dark"
+pygmentscodefences = true
+pygmentscodefencesguesssyntax = true
+
 [permalinks]
   blog = "/:filename/"
 
