@@ -3,12 +3,12 @@ title: "Validating Terraform plans with the Open Policy Agent"
 date: 2019-07-20T21:37:03+02:00
 draft: false
 tags: ["terraform", "conftest", "open-policy-agent"]
-abstract: "Validating wether a set of resources in the cloud comply with your internal company policies is hard. Of course proprietary tools exists for cloud providers that evaluate all resources in that cloud provider, but that already limits their usability. In this post I will introduce the Open Policy Agent as a generic policy evaluation engine that could solve all your compliance problem, and I will show a real world example using the Open Policy Agent to evaluate Terraform Plans."
+abstract: "Validating whether a set of resources in the cloud comply with your internal company policies is hard. Of course proprietary tools exists for cloud providers that evaluate all resources in that cloud provider, but that already limits their usability. In this post I will introduce the Open Policy Agent as a generic policy evaluation engine that could solve all your compliance problem, and I will show a real world example using the Open Policy Agent to evaluate Terraform Plans."
 ---
 
 # Validating Terraform plans with the Open Policy Agent
 
-Teams in a DevOps organisation should be free to setup and manage the infrastructure for their services. Terraform is a great way to allow teams to declaratively define their infrastructure needs. However, from a compliance and security perspective, you want to place certain guardrails in place. One such guardrail is of course restricting the set of permissions the teams are given. This stops teams from deploying infrastructure your organisation does not have a need for (Most likely your teams do not need to setup [satellite connections from the cloud](https://aws.amazon.com/ground-station/)) and prevents them from editing resources not managed by them. But it does not cover all rules and regulations that you want to enforce. For example, you also want to ensure that teams do not create public databases, or that the naming convention of your organisation is followed.
+Teams in a DevOps organisation should be free to setup and manage the infrastructure for their services. Terraform is a great way to allow teams to declaratively define their infrastructure needs. However, from a compliance and security perspective, you want to place certain guardrails in place. One such guardrail is of course restricting the set of permissions the teams are given. This stops teams from deploying infrastructure your organisation does not have a need for (Most likely your teams do not need to setup [satellite connections from the cloud](https://aws.amazon.com/ground-station/)) and prevents them from editing resources not managed by them. But it does not cover all rules and regulations that you want to enforce. You also want to ensure that teams do not create public databases, or that the naming convention of your organisation is followed.
 
 One approach you could take is to setup an auditing service like [AWS Config](https://aws.amazon.com/config/):
 
@@ -76,7 +76,7 @@ is_proper_url(url) {
 }
 ```
 
-Here we define a function `is_proper_url` which takes in a url and evaluates wether it matches a regex pattern (using the build in `re_match` function). When evaluating the query:
+Here we define a function `is_proper_url` which takes in a url and evaluates whether it matches a regex pattern (using the build in `re_match` function). When evaluating the query:
 
 ```golang
 is_proper_url("https://play.openpolicyagent.org")
@@ -110,7 +110,9 @@ Next lets work on a real world example! Along the way I will show some of the mo
 
 ## Using the Open Policy Agent to validate Terraform plans
 
-Before Terraform deploys a set of resources it creates a plan of all the changes it will apply. With OPA, we can validate these plans to ensure they comply with our regulations and standards. For example, lets say we have several teams working with Terraform to deploy AWS resources. We want to ensure teams apply [AWS Tagging best practices](https://aws.amazon.com/answers/account-management/aws-tagging-strategies/), as it allows us to easily search for resources and setup budget reports per team.
+Before Terraform deploys a set of resources it creates a plan of all the changes it will apply. With OPA, we can validate these plans to ensure they comply with our regulations and standards.
+
+Now lets work on a real world situation. Lets say we have several teams working with Terraform to deploy AWS resources. We want to ensure teams apply [AWS Tagging best practices](https://aws.amazon.com/answers/account-management/aws-tagging-strategies/), as it allows us to easily search for resources and setup budget reports per team.
 
 Terraform generates a terraform specific execution plan. However, OPA only understands JSON input. Luckily, Terraform 0.12 came with the ability to output plans in json (For Terraform pre 0.12, you can use [tfjson](https://github.com/palantir/tfjson)):
 
@@ -150,7 +152,7 @@ tags_contain_proper_keys(tags) {
 }
 ```
 
-We define three functions here: `key_val_valid_pascal_case` validates wether the keys and values are proper pascal case, `is_pascal_case` is a helper function that determines wether a string is pascal case. `tags_contain_proper_keys` validates wether the tags contain atleast the minumum set of tags: ApplicationRole, Owner and Project. Note that we are using a [set comprehension](https://www.openpolicyagent.org/docs/latest/how-do-i-write-policies/#set-comprehensions) to generate a set of keys after which we use set operations to check if the tags contain the minimum set.
+We define three functions here: `key_val_valid_pascal_case` validates whether the keys and values are proper pascal case, `is_pascal_case` is a helper function that determines whether a string is pascal case. `tags_contain_proper_keys` validates whether the tags contain atleast the minumum set of tags: ApplicationRole, Owner and Project. Note that we are using a [set comprehension](https://www.openpolicyagent.org/docs/latest/how-do-i-write-policies/#set-comprehensions) to generate a set of keys after which we use set operations to check if the tags contain the minimum set.
 
 Now that we have the functions in place to validate the tags, we can write the actual rules. Ideally our rules also contain some information on which resources where affected and which rule they broke:
 
@@ -199,4 +201,4 @@ The two `deny` rules use [incremental rule definitions](https://www.openpolicyag
 
 Hopefully you have seen what can be achieved with the Open Policy Agent. It is a really powerful tool for policy evaluation that can be used in multiple places in your architecture to evaluate compliance policies. Although it takes some time to get used to writing Rego policies due to its declarative nature, it is a really powerful language that lets you focus on what you want to achieve, instead of focusing on how to achieve it. And once you know how to write Rego policies, you can apply them across the entire stack!
 
-You can find the code for this blog post on [github](https://github.com/Blokje5/validating-terraform-with-conftest)
+You can find the code for this blog post on [GitHub](https://github.com/Blokje5/validating-terraform-with-conftest).
