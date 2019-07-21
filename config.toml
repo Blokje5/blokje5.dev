@@ -4,6 +4,8 @@ theme = "hugo-coder"
 languagecode = "en"
 defaultcontentlanguage = "en"
 canonifyurls = true
+favicon_32 = "/img/favicon-32x32.png"
+favicon_16 = "/img/favicon-16x16.png"
 
 pygmentsstyle = "solarized-dark"
 pygmentscodefences = true
