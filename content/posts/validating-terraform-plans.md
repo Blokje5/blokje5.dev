@@ -3,7 +3,7 @@ title: "Validating Terraform plans with the Open Policy Agent"
 date: 2019-07-20T21:37:03+02:00
 draft: false
 tags: ["terraform", "conftest", "open-policy-agent"]
-abstract: "Validating whether a set of resources in the cloud comply with your internal company policies is hard. Of course proprietary tools exists for cloud providers that evaluate all resources in that cloud provider, but that already limits their usability. In this post I will introduce the Open Policy Agent as a generic policy evaluation engine that could solve all your compliance problem, and I will show a real world example using the Open Policy Agent to evaluate Terraform Plans."
+abstract: "Validating whether a set of resources in the cloud comply with your internal company policies is hard. Of course proprietary tools exists for cloud providers that evaluate all resources in that cloud provider, but that already limits their usability. In this post I will introduce the Open Policy Agent as a generic policy evaluation engine that could solve all your compliance problems, and I will show a real world example using the Open Policy Agent to evaluate Terraform Plans."
 ---
 
 # Validating Terraform plans with the Open Policy Agent
@@ -26,7 +26,7 @@ There are two problems with this approach however:
 
 In order to remediate the previously described issues, we need a more flexible tool for our governance needs. Preferably we also would like to run the tool as a validation step before the resources are actually deployed.
 
-Luckily for us, such a tool exists, the Open Policy Agent:
+Luckily for us, such a tool exists, the [Open Policy Agent](https://www.openpolicyagent.org/):
 
 > Open Policy Agent (OPA) is a general-purpose policy engine with uses ranging from authorization and admission control to data filtering. OPA provides greater flexibility and expressiveness than hard-coded service logic or ad-hoc domain-specific languages. And it comes with powerful tooling to help you get started
 
