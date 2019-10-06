@@ -15,6 +15,32 @@ In order to ensure all teams can build in compliance in their development life c
 - Policies need to be validated on correctness
 - Configuration changes can not be applied without validation
 
-These requirements ensure that every change applied by developers in the organisation keeps the system in a compliant state. 
+These requirements ensure that every change applied by developers in the organisation keeps the system in a compliant state.
 
- 
+## Centralising Rego policies
+
+In order to make the policies accessible to all developers, we need to store the policies in a centrally accessible location. Luckily, [conftest](https://github.com/instrumenta/conftest) support storing Rego policies in a Docker registry. Under the hood, conftest is utilising [ORAS](https://github.com/deislabs/oras). ORAS, or OCI Registry As Storage is an initiative by Microsoft to support pushing artifacts to OCI Spec Compliant registries. Rego policies are stored using the [Bundle format](https://www.openpolicyagent.org/docs/latest/management/#bundles) specified by the Open Policy Agent.
+
+Let's look at an example of how that can work. First we need access to a Docker registry. At the moment of writing, only two registries support ORAS, namely the [Docker distribution](https://github.com/docker/distribution) and the [Azure Container Registry](https://azure.microsoft.com/nl-nl/services/container-registry/). I will be using the Docker distribution.
+
+```bash
+docker run -d --rm -p 5000:5000 --name registry registry:2
+```
+
+This command starts a local Docker registry, running in detached mode. Now we can push policies to the registry using conftest:
+
+```bash
+conftest push localhost:5000/policies:latest
+```
+
+This command pushes the policies in your local directory to the Docker registry. By default conftest looks for policies in the `policy` directory, but this can be overridden by specifying the `--policy` flag. The syntax is similar to how you would push a Docker container, where you specify the registry location, the name of the image and an optional tag.
+
+These policies can then be pulled using the pull command:
+
+```bash
+conftest pull localhost:5000/policies:latest
+```
+
+The `pull` command by default pulls policies into the `policy` directory.
+
+With central storage in place, a single (or multiple depending on the size of your organisation) compliance platform team can maintain the policies. Developers can easily access the latest version of the policies.
