@@ -44,3 +44,45 @@ conftest pull localhost:5000/policies:latest
 The `pull` command by default pulls policies into the `policy` directory.
 
 With central storage in place, a single (or multiple depending on the size of your organisation) compliance platform team can maintain the policies. Developers can easily access the latest version of the policies.
+
+## Validating the policies
+
+Rego can be hard. We don't want to push policies that are broken. If the policies are broken, changes can be applied that need to be manually resolved later. Which is inefficient of course. Luckily, Rego policies have built in support for unit tests.
+
+Rego tests are just regular Rego policies, but with the rules prefixed with `test_`. Let's look at an example:
+
+```golang
+package tags_validation
+
+minimum_tags = {"ApplicationRole", "Owner", "Project"}
+
+tags_contain_proper_keys(tags) {
+    keys := {key | tags[key]}
+    leftover := minimum_tags - keys
+    leftover == set()
+}
+```
+
+The function `tags_contain_proper_keys` validates whether a set of tags contain the minimum required tags. We can test this with the following unit test:
+
+```golang
+package aws.tags_validation
+
+test_tags_contain_proper_keys {
+    tags := { "ApplicationRole": "ArtifactRepository", "Project": "Artifacts", "Owner": "MyTeam", "Country": "Nl" }
+    tags_contain_proper_keys(tags)
+}
+
+test_tags_contain_proper_keys_missing_key {
+    tags := { "ApplicationRole": "ArtifactRepository", "Project": "Artifacts", "Country": "Nl" }
+    not tags_contain_proper_keys(tags)
+}
+```
+
+This passes a set of tags to the  function and asserts whether the function returns the expected result. Just like with regular code, it is important to validate what you write.
+
+conftest supports the `verify` command to the test Rego policies:
+
+```bash
+conftest verify
+```
