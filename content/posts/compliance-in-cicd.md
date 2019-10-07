@@ -346,3 +346,14 @@ Normally, a `PipelineRun` would be created by an event, such as a push to a GitH
 ```bash
 kubectl logs opa-pipelinerun-validate-terraform-plan-zrcjl-pod-b957cd step-conftest-test
 ```
+
+## Conclusion
+
+In the introduction, I laid down some requirements to build in compliance as part of the development cycle:
+
+- The latest version of the policies needs to be easily accessible by developers
+- Updates to policies can quickly be applied accross the organisation
+- Policies need to be validated on correctness
+- Configuration changes can not be applied without validation
+
+We walked through an example of how conftest can be used as tool to validate configuration changes across the organisation. By centrally managing policies and utilising a single deployment pipeline, you can ensure that changes are always validated against Rego policies. Using unit-tests in Rego ensures that policies function as expected.  By fulfilling these requirements, your environment will remain compliant with whatever you define in the Rego policies.
