@@ -19,9 +19,9 @@ These requirements ensure that every change applied by developers in the organis
 
 ## Centralising Rego policies
 
-In order to make the policies accessible to all developers, we need to store the policies in a centrally accessible location. Luckily, [conftest](https://github.com/instrumenta/conftest) support storing Rego policies in a Docker registry. Under the hood, conftest is utilising [ORAS](https://github.com/deislabs/oras). ORAS, or OCI Registry As Storage is an initiative by Microsoft to support pushing artifacts to OCI Spec Compliant registries. Rego policies are stored using the [Bundle format](https://www.openpolicyagent.org/docs/latest/management/#bundles) specified by the Open Policy Agent.
+In order to make the policies accessible to all developers, we need to store the policies in a centrally accessible location. Luckily, [conftest](https://github.com/instrumenta/conftest) support storing Rego policies in a Docker registry. Under the hood, conftest is utilising [ORAS](https://github.com/deislabs/oras). ORAS, or OCI Registry As Storage, is an initiative by Microsoft to support pushing artifacts to OCI Spec Compliant registries. Rego policies are stored in the Registry using the [Bundle format](https://www.openpolicyagent.org/docs/latest/management/#bundles) specified by the Open Policy Agent.
 
-Let's look at an example of how that can work. First we need access to a Docker registry. At the moment of writing, only two registries support ORAS, namely the [Docker distribution](https://github.com/docker/distribution) and the [Azure Container Registry](https://azure.microsoft.com/nl-nl/services/container-registry/). I will be using the Docker distribution.
+Let's look at an example of how that can work. First we need access to a Docker registry. At the moment of writing, only two registries support ORAS, namely the [Docker distribution](https://github.com/docker/distribution) and the [Azure Container Registry](https://azure.microsoft.com/nl-nl/services/container-registry/). For this example, I will be using the Docker distribution.
 
 ```bash
 docker run -d --rm -p 5000:5000 --name registry registry:2
@@ -47,7 +47,7 @@ With central storage in place, a single (or multiple depending on the size of yo
 
 ## Validating the policies
 
-Rego can be hard. We don't want to push policies that are broken. If the policies are broken, changes can be applied that need to be manually resolved later. Which is inefficient of course. Luckily, Rego policies have built in support for unit tests.
+Writing Rego policies can be hard. We don't want to push policies that are broken. If the policies are broken, changes can be applied that need to be manually resolved later. Which is inefficient of course. Even worse, security vulnerabilities might make it to production! Luckily, Rego policies have built in support for unit tests.
 
 Rego tests are just regular Rego policies, but with the rules prefixed with `test_`. Let's look at an example:
 
@@ -66,7 +66,7 @@ tags_contain_proper_keys(tags) {
 The function `tags_contain_proper_keys` validates whether a set of tags contain the minimum required tags. We can test this with the following unit test:
 
 ```golang
-package aws.tags_validation
+package tags_validation
 
 test_tags_contain_proper_keys {
     tags := { "ApplicationRole": "ArtifactRepository", "Project": "Artifacts", "Owner": "MyTeam", "Country": "Nl" }
@@ -87,13 +87,17 @@ conftest supports the `verify` command to the test Rego policies:
 conftest verify
 ```
 
+Executing this command yields a list of passed and failed unit-tests:
+
+![conftest verify](/conftest-verify.png)
+
 ## Including conftest in CI/CD
 
-We need to ensure that all configuration changes are validated against the policies. Otherwise the policies lose their value. If there is a way to avoid validating changesets, there is no longer a guarantee that the environment is compliant.
+We need to ensure that all configuration changes are validated against the policies. Otherwise the policies lose their value. If there is a way to avoid validating a changeset, there is no longer a guarantee that the environment is compliant.
 
-One approach to solve this problem is to have a handoff in the CI/CD pipeline. Teams can build their own CI pipeline, where they apply their own tests and validation, but the deployment is handled by a different pipeline maintained by the platform team. For example, teams can validate their own Terraform code, but in order to deploy it, they push the code to another git repository. This triggers the deployment pipeline that validates the changeset and applies the changes.
+One approach to solve this problem is to have a handoff in the CI/CD pipeline. Teams can build their own CI pipeline, where they apply their own tests and validation, but the deployment is handled by a different pipeline maintained by the platform team. This gives the teams control over their own code, but allows the platform team control over which changes are applied in production.
 
-I will revisit the example of the previous post and assume we have development teams that want to deploy an S3 bucket using Terraform. We want to ensure that the S3 buckets remain compliant. Specifically we want to check whether an S3 bucket has an Access Block. An Access Block prevents any object in the bucket from being publicly accessible. Take the following Terraform code for example:
+I will revisit the example of the previous post and assume we have development teams that want to deploy an S3 bucket using Terraform. We want to ensure that objects in any S3 buckets are not publicly accessible. So we want to ensure that every S3 bucket created in our environment has an Access Block. An Access Block prevents any object in the bucket from being publicly accessible. Take the following Terraform code for example:
 
 ```golang
 resource "aws_s3_bucket" "profile_picture_storage" {
@@ -133,7 +137,7 @@ resource "aws_s3_bucket_public_access_block" "profile_picture_storage_access_rul
 }
 ```
 
-This is a change that is easily missed in a code review, but we still want to ensure this bucket (and the application that depends on it) is never deployed. So we write a Rego policy to cover this situation:
+This is a change that is easily missed in a code review, but we still want to ensure this bucket (and the application that depends on it) is never deployed, as this could lead to public objects in our S3 bucket. So we write a Rego policy to cover this situation:
 
 ```golang
 package main
@@ -181,7 +185,7 @@ deny[msg] {
 
 This policy uses a set difference between the set of buckets with access blocks and the full set of S3 buckets. This yields a set of buckets without access blocks. These are checked in a deny rule that checks if this set is not empty. If that is the case an error is thrown by conftest, reporting the violating terraform resources.
 
-The Rego policy will be validated in the deployment pipeline. I will be using [Tekton](https://github.com/tektoncd/pipeline) for this example, but the principles apply to any CI/CD pipeline. Tekton provides [CustomResourceDefinitions](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/) for CI/CD pipelines in your Kubernetes cluster. It adds the `Pipeline` and `Task` abstraction in Kubernetes that leverage containers as building blocks. 
+The Rego policy will be validated in the deployment pipeline. I will be using [Tekton](https://github.com/tektoncd/pipeline) for this example. Tekton provides [CustomResourceDefinitions](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/) for CI/CD pipelines in your Kubernetes cluster. It adds the `Pipeline` and `Task` abstraction in Kubernetes that leverage containers as building blocks to build a CI/CD pipeline.
 
 First we need to create a Kubernetes cluster and deploy Tekton into the cluster:
 
@@ -313,7 +317,9 @@ spec:
         value: eu-west-1
 ```
 
-This `Task` defines our deployment pipeline. The `cp` step copies over Terraform files from a `ConfigMap` in Kubernetes. Normally you would be using GitHub as a source for the Terraform files, but this works better for local development. The next steps then initialize terraform in the `/workspace` directory and create a plan of the changes to be applied. In the `conftest-pull` step, the policies are pulled from a central docker registry. Then, in the `conftest-test` step, the Terraform plan is  validated against the policies. If this returns a non-zero exit code, the `Task` will stop and the `terraform-apply` will never be executed. Exactly what we want if there is no Access Block in the changeset!
+This `Task` defines our deployment pipeline. The `cp` step copies over Terraform files from a `ConfigMap` in Kubernetes (normally you would be using GitHub (or another version control system) as a source for the Terraform files, but using configmaps is easier for local development). The next steps then initialize terraform in the `/workspace` directory and create a Terraform plan of the infrastructure changeset that would be applied by this "commit". 
+
+In the `conftest-pull` step, the policies are pulled from a central docker registry. Then, in the `conftest-test` step, the Terraform plan is  validated against the Rego policies that where pulled from the Docker registry. If the changeset triggers the deny rule, conftest will return an error message and a non-zero exit code. Tekton will stop the `Task` from progressing and the `terraform-apply` will never be executed. Exactly what we want if there is no Access Block in the changeset!
 
 We can then reference this `Task` in a Tekton `Pipeline`:
 
@@ -344,8 +350,12 @@ spec:
 Normally, a `PipelineRun` would be created by an event, such as a push to a GitHub repository or a new image that is pushed to a Docker Registry. If everything went well, this pipeline will fail with an error stating which resource in the Terraform changeset is non-compliant. You can check the Tekton errors by checking the logs:
 
 ```bash
-kubectl logs opa-pipelinerun-validate-terraform-plan-zrcjl-pod-b957cd step-conftest-test
+kubectl logs opa-pipelinerun-validate-terraform-plan-9fnmh-pod-63eafb step-conftest-test
 ```
+
+This will show that indeed, there is a non-compliant resource:
+
+![failed pipeline](/failed-pipeline.png)
 
 ## Conclusion
 
