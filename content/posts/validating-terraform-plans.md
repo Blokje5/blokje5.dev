@@ -6,8 +6,6 @@ tags: ["terraform", "conftest", "open-policy-agent"]
 abstract: "Validating whether a set of resources in the cloud comply with your internal company policies is hard. Of course proprietary tools exists for cloud providers that evaluate all resources in that cloud provider, but that already limits their usability. In this post I will introduce the Open Policy Agent as a generic policy evaluation engine that could solve all your compliance problems, and I will show a real world example using the Open Policy Agent to evaluate Terraform Plans."
 ---
 
-# Validating Terraform plans with the Open Policy Agent
-
 Teams in a DevOps organisation should be free to setup and manage the infrastructure for their services. Terraform is a great way to allow teams to declaratively define their infrastructure needs. However, from a compliance and security perspective, you want to place certain guardrails in place. One such guardrail is of course restricting the set of permissions the teams are given. This stops teams from deploying infrastructure your organisation does not have a need for (Most likely your teams do not need to setup [satellite connections from the cloud](https://aws.amazon.com/ground-station/)) and prevents them from editing resources not managed by them. But it does not cover all rules and regulations that you want to enforce. You also want to ensure that teams do not create public databases, or that the naming convention of your organisation is followed.
 
 One approach you could take is to setup an auditing service like [AWS Config](https://aws.amazon.com/config/):

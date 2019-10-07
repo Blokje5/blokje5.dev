@@ -1,5 +1,5 @@
 ---
-draft: true
+draft: false
 date: 2019-10-06T13:40:20+02:00
 title: "Building in compliance in your CI/CD pipeline with conftest"
 tags: ["conftest", "open-policy-agent", "tekton"]
