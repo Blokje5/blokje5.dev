@@ -6,6 +6,8 @@ tags: ["conftest", "open-policy-agent", "tekton"]
 abstract: "In the previous post I introduced the Open Policy Agent as a method to validate configuration changes against policies to maintain compliance in your environment. In this post I will show how you can utilise the Open Policy Agent with conftest to build in compliance checks in your CI/CD pipeline and how conftest can be used to centrally manage the Rego policies."
 ---
 
+> The code for the examples in this post can be found on [GitHub](https://github.com/Blokje5/terraform-deployment-pipeline).
+
 In the [previous post]({{< ref "validating-terraform-plans.md" >}}) I introduced the Open Policy Agent as a method to validate configuration changes against policies to maintain compliance in your environment. In this post I will show how you can utilise the Open Policy Agent with conftest to build in compliance checks in your CI/CD (Continuous Integration/Continuous Delivery) pipeline and how conftest can be used to centrally manage the Rego policies.
 
 In order to ensure all teams can build in compliance in their development life cycle, we need to ensure every change is validated. In other words: we need to incorporate it as part of the continues integration process. There are several requirements that need to be met before we can achieve this:
