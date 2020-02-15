@@ -17,10 +17,72 @@ In this blog post I will explain how you can use plugins to extend conftest. I w
 
 ## Using conftest plugins
 
-Conftest plugins are stored in a local cache directory, located by default in `~/.conftest/plugins`. Conftest loads plugins located in the cache directory, and makes the plugins available as part of the conftest CLI. For example, if you load the kubectl plugin, this plugin is available in conftest as `conftest kubectl`. To add a plugin to conftest, you need to install it.
+Conftest plugins are stored in a local cache directory, located by default in `~/.conftest/plugins`. Conftest loads plugins located in the cache directory, and makes the plugins available as part of the conftest CLI. For example, if you load the kubectl plugin, this plugin is available in conftest as `conftest kubectl`. 
 
+Installing plugins is easy using the `conftest plugin install` command. This command should be invoked by passing a valid URL. Conftest will then fetch the plugin from the URL and ensure it is properly installed into the cache. After that you should be able to use the plugin. Under the hood conftest uses the [go-getter](https://github.com/hashicorp/go-getter) library to download plugins. This means plugins can be downloaded from git, Amazon s3, Google cloud buckets, etc. To add a plugin to conftest, you need to install it. To install the kubectl plugin from the conftest github repository we can run the following command:
 
-Installing plugins is easy using the `conftest plugin install` command. This command should be invoked by passing a valid URL. Conftest will then fetch the plugin from the URL and ensure it is properly installed into the cache. After that you should be able to use the plugin. Under the hood conftest uses the [go-getter](https://github.com/hashicorp/go-getter) library to download plugins. This means plugins can be downloaded from git, Amazon s3, Google cloud buckets, etc.
+```console
+conftest plugin install git::https://github.com/instrumenta/conftest.git//examples/plugins/kubectl
+```
+
+Note the double slash, that is actually necessary to download relative paths in Git. Once the plugin is installed, it can be used directly by calling the contest CLI. We can try this with the kubectl plugin. With the kubectl plugin we can test Rego policies against a live cluster. For example, we can use a simple policy to check if there are any containers in our cluster that run as root:
+
+```rego
+package main
+
+deny[msg] {
+  input.kind = "Deployment"
+  not input.spec.template.spec.securityContext.runAsNonRoot
+
+  msg = sprintf("Containers must not run as root in Deployment %s", [name])
+}
+```
+
+Preventing a container to run as a non-root user is a security best practice. It prevents a potential attacker to gain access to the host from the container if they somehow manage to gain access to your container. Now let's verify if this is the case for some running deployments.
+
+First we need a Kubernetes cluster. The quickest way to do this locally is by using [kind](https://github.com/kubernetes-sigs/kind), which builds a local Kubernetes cluster running in docker containers. We can build a cluster with the following command:
+
+```console
+kind create cluster --name conftest-demo --wait 200s
+export KUBECONFIG=$(kind get kubeconfig-path --name conftest-demo)
+```
+
+This will create a simple kubernetes cluster on your local computer. We also make sure we setup our kubeconfig to point to the newly created cluster. Now let's deploy a simple application:
+
+```yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+```
+
+As you can see, we did not configure a [SecurityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) on this deployment. That means any container we run can run as root. We can now validate this against our Rego policy using the kubectl plugin:
+
+```console
+conftest kubectl deployment nginx-deployment
+FAIL - Containers must not run as root in Deployment nginx-deployment
+```
+
+Great! now we can validate live applications in a Kubernetes cluster against our policies!
+
+## Plugins behind the scenes
 
 So how does conftest know what to do when a plugin is called? Each plugin is identified by a `plugin.yaml` file. This file contains the name of the plugin, some metadata and the command to execute when the plugin starts up. For example, the kubectl plugin is defined as follows:
 
