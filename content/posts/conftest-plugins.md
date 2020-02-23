@@ -38,7 +38,7 @@ deny[msg] {
 }
 ```
 
-Preventing a container to run as a non-root user is a security best practice. It prevents a potential attacker to gain access to the host from the container if they somehow manage to gain access to your container. Now let's verify if this is the case for some running deployments.
+Preventing a container to run as a non-root user is a security best practice. It prevents a potential attacker to gain access to the host from the container if they somehow manage to gain access to your container. For example, an attacker could have exploited a code execution vulnerability in your application. Now let's use the kubectl plugin to verify if this is the case for some running deployments.
 
 First we need a Kubernetes cluster. The quickest way to do this locally is by using [kind](https://github.com/kubernetes-sigs/kind), which builds a local Kubernetes cluster running in docker containers. We can build a cluster with the following command:
 
@@ -178,9 +178,9 @@ As you can see, writing a plugin really is not that hard. Now let's create a plu
 
 I work a lot with AWS infrastructure. Ideally I want to reuse the same policies in Rego I use to validate [Terraform deployments]({{< ref "validating-terraform-plans.md" >}}). So let's create a (simple) plugin that allows us to monitor AWS resources.
 
-In order to create a plugin, we need two components: an executable and a `plugin.yaml` file. Our executable should be able to interact with AWS reosurces. We can leverage the python library [boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) to interact with the AWS API. The AWS CLI itself is also written using boto3.
+In order to create a plugin, we need two components: an executable and a `plugin.yaml` file. Our executable should be able to interact with AWS resources. We can leverage the python library [boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) to interact with the AWS API. The AWS CLI itself is also written using boto3.
 
-To make our executable a bit more user friendly, we can leverage [click](https://click.palletsprojects.com/en/7.x/). Click is a python library to make beautiful CLI tools. So let's get started:
+To make our executable a bit more user friendly, we can use [click](https://click.palletsprojects.com/en/7.x/). Click is a python library to make beautiful CLI tools. So let's get started:
 
 ```python
 import datetime
@@ -253,9 +253,9 @@ if __name__ == "__main__":
     cli(obj={})
 ```
 
-This python code creates a subcommand called `ec2`. The `ec2` subcommand takes an AWS EC2 identifier as input and calls the `describe_instances` method to fetch some information about the instance. Depending on whether the `--output` flag is passed it will either pretty-print the information, or it will call `conftest` using the `subprocess` library in python. In the `call_conftest` method, we pipe the output of the `describe_instances` to `conftest` and print out the results.
+This python code creates a subcommand called `ec2`. The `ec2` subcommand takes an AWS EC2 identifier as input and calls the `describe_instances` method to fetch some information about the EC2 instance. Depending on whether the `--output` flag is passed it will either pretty-print the information, or it will call `conftest` using the `subprocess` library in python. In the `call_conftest` method, we pipe the output of the `describe_instances` to `conftest` and print out the results. Conftest of course will use the [Open Policy Agent](https://www.openpolicyagent.org/) to validate the passed input against a Rego policy.
 
-Now we need to define a `plugin.yaml` for this plugin:
+In order to use this python snippet as a conftest plugin, we need to define a `plugin.yaml` for this plugin:
 
 ```yml
 name: "aws"
@@ -267,7 +267,7 @@ description: |-
 command: python $CONFTEST_PLUGIN_DIR/main.py
 ```
 
-The plugin is now ready for action. First we need to install it:
+The command calls the python interpreter to execute the python script we created. The plugin is now ready for action. First we need to install it:
 
 ```console
 conftest plugin install https://github.com/Blokje5/aws-conftest-plugin.git
