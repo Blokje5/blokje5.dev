@@ -2,7 +2,7 @@
 title: "Dockerizing your development environment"
 date: 2020-02-23T13:43:30+02:00
 draft: false
-tags: ["vs code", "docker"]
+tags: ["vscode", "docker"]
 abstract: "Keeping up with the latest and greatest in the software industry requires a constantly changing development environment. Keeping your local machine clean is hard if you constantly install new tools. And what if you need multiple versions of the same tool installed? With Visual Studio Code Dev Containers you can dockerize your development environment to ensure that for each project you can use a clean and reproducible environment! "
 ---
 
@@ -155,4 +155,20 @@ docker build -t hello-world:latest .
 
 Hmm, we get an error: `Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?`. The Docker Daemon is not running. We are trying to build Docker containers inside of a Docker container. How do we get Docker in Docker?
 
-## Docker in Docker?
+## Docker in Docker
+
+In order to use the Docker CLI you need a Docker Daemon available on from inside the Dev Container. There are a number of technical reasons why it is a bad idea to start a Docker Daemon inside a Docker container. If you want to read more, you could check out [Jérôme Petazzoni's blog on this topic](https://jpetazzo.github.io/2015/09/03/do-not-use-docker-in-docker-for-ci/). Luckily there are other ways we can make Docker in Docker work. You can actually connect Docker to the Docker Daemon running on your machine! 
+
+In order to connect the Dev Container to the Docker Daemon, we need to mount the unix socket the Docker Daemon listens to. Add the following snippet to your `devcontainer.json` file:
+
+```json
+"mounts": [ "source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind" ],
+```
+
+And the following snippet to the `Dockerfile`:
+
+```dockerfile
+RUN ln -s "/var/run/docker-host.sock" "/var/run/docker.sock"
+```
+
+And use the `Remote-Containers: Rebuild Container` command to restart the Dev Container. Now when you run `docker build -t hello-world:latest .` the Docker container should be build from inside the container. You can use `docker image ls` to verify that your image is build. Actually, you can see all images from your local machine, but this is because the Dev Container is connected to the Docker Daemon on your machine. For a more advanced configuration of Docker in Docker, I suggest you check out the [example provided by Microsoft](https://github.com/microsoft/vscode-dev-containers/tree/master/containers/docker-in-docker).
