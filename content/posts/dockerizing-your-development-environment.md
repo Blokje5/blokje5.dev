@@ -172,3 +172,8 @@ RUN ln -s "/var/run/docker-host.sock" "/var/run/docker.sock"
 ```
 
 And use the `Remote-Containers: Rebuild Container` command to restart the Dev Container. Now when you run `docker build -t hello-world:latest .` the Docker container should be build from inside the container. You can use `docker image ls` to verify that your image is build. Actually, you can see all images from your local machine, but this is because the Dev Container is connected to the Docker Daemon on your machine. For a more advanced configuration of Docker in Docker, I suggest you check out the [example provided by Microsoft](https://github.com/microsoft/vscode-dev-containers/tree/master/containers/docker-in-docker).
+
+
+## Conclusion
+
+Hopefully I showed you how you can use Dev Containers to create a reusable and shareable development environment. I showed you the basics of configuring the Dev Container and the instance of vscode that is running inside of the container. But there is still a lot that you can explore. For example, you can [attach the Dev Container to a a Kubernetes cluster and run it form inside]() or you could [preload it with your Dotfiles](https://code.visualstudio.com/docs/remote/containers#_personalizing-with-dotfile-repositories). I definitely suggest you give it a try, even if Visual Studio Code is not your IDE of choice.
