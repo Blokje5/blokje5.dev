@@ -2,11 +2,9 @@
 draft = true
 date = 2021-01-10T21:16:04+01:00
 title = "A guide to Kubernetes Operators"
-abstract = ""
+abstract = "Kubernetes operators are the building blocks of Kubernetes. They ensure the changes applied via a YAML file lead to actual changes to the infrastructure. In this blog post I will dive into what exactly an operator is and what is needed to create your own operator. "
 tags = ["kubernetes", "kubebuilder", "kubernetes-operators"]
 +++
-
-Kubernetes operators provide 
 
 ## What is an operator
 
