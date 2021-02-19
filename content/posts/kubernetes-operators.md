@@ -94,3 +94,18 @@ The [Kubernetes API](https://kubernetes.io/docs/reference/using-api/api-concepts
 While it is definitely possible to directly interact with the Kubernetes API, there are also a lot of [API client libraries](https://kubernetes.io/docs/reference/using-api/client-libraries/) that handle a lot of the details of interacting with the Kubernetes API, such as authentication and handling error responses. For example, when interacting with the Kubernetes API in golang, you can use the [client-go](https://github.com/kubernetes/client-go) library. 
 
 The client-go library also provides useful abstractions for creating operators. It provides the `ListWatcher` to first list a set of resources from the Kubernetes API and then watch for changes. The `Informer` then uses the change events provided by the `ListWatcher` to trigger one or more `ResourceEventHandlers`. `ResourceEventHandlers` provide hooks for changes to a resource, such as `OnAdd` and `OnDelete`. This can be used to implement the control loop described above: The `ResourceEventHandlers` ensure the current state is reconciled with the desired state. There is a [great blog post from Bitnami](https://engineering.bitnami.com/articles/a-deep-dive-into-kubernetes-controllers.html) that has a more in depth explanation on each of these abstractions.
+
+## Operator Frameworks
+
+However, manually interacting with the Kubernetes API, even when utilising the great client libraries, leads to a lot of boiler plate code. You have to initialise the `ListWatchers` and `Informers` correctly and configure them to watch the right resources. You have to create a CRD, which can take hundreds or even thousands of lines of yaml to write. You have to figure out what RBAC permissions your operator needs in order to connect to the Kubernetes API. And then we haven't even started talking about logging, monitoring & testing.
+
+Luckily there are several frameworks that reduce the boilerplate code for your operator and allow you to focus on writing the reconciliation loop. There are frameworks for Golang, Java and Python. There are even frameworks that allow you to write operators using Helm or Ansible. The following list shows a few of the most used operator frameworks:
+
+- [Kubebuilder](https://github.com/kubernetes-sigs/kubebuilder): A golang based framework for writing Kubernetes Operators. It utilises the [controller-runtime](https://github.com/kubernetes-sigs/controller-runtime) library under the hood.
+- [Operator SDK](https://github.com/operator-framework/operator-sdk): Also a golang based framework that has a lot of similarities with Kubebuilder. However, it also supports Ansible and Helm based operators.
+- [Kudo](https://kudo.dev/): A framework that allows you to build operators mostly using YAML.
+- [Kopf](https://github.com/nolar/kopf): If golang or yaml is not your style, you can also use python to write your operators.
+
+Each of these frameworks have their own unique selling points. Depending on what you want to achieve you will choose a different framework. For example, Kudo is great for simple operators, but yaml is too limiting if you want to connect to external APIs or if you want to execute complex logic during reconciliation.
+
+In the next blog post in the series I will explain how you can write an operator using the Kubebuilder framework.
