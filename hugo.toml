@@ -11,6 +11,9 @@ pygmentsstyle = "solarized-dark"
 pygmentscodefences = true
 pygmentscodefencesguesssyntax = true
 
+[markup.highlight]
+style = "github-dark"
+
 [permalinks]
   blog = "/:filename/"
 
@@ -23,6 +26,12 @@ pygmentscodefencesguesssyntax = true
     hidecopyright = false
     rtl = false
     math = false
+
+[taxonomies]
+  category = "categories"
+  series = "series"
+  tag = "tags"
+  author = "authors"
 
 [[params.social]]
     name = "Github"
