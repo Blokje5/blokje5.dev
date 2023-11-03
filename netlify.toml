@@ -1,9 +1,9 @@
 [build]
 publish = "public"
-command = "hugo --gc --minify --baseURL $URL"
+command = "hugo --config hugo.toml --gc --minify --baseURL $URL"
 
 [context.deploy-preview]
-command = "hugo --gc --minify --buildFuture --baseURL $DEPLOY_URL"
+command = "hugo --config hugo.toml --gc --minify --buildFuture --baseURL $DEPLOY_URL"
 
 [context.branch-deploy]
-command = "hugo --gc --minify --buildFuture -b $DEPLOY_PRIME_URL"
+command = "hugo --config hugo.toml --gc --minify --buildFuture -b $DEPLOY_PRIME_URL"
