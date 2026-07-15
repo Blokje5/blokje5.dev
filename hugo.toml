@@ -21,6 +21,17 @@ defaultContentLanguage = "en"
   favicon_32 = "/img/favicon-32x32.png"
   favicon_16 = "/img/favicon-16x16.png"
 
+[params.giscus]
+  repo = "Blokje5/blokje5.dev"
+  repoID = "MDEwOlJlcG9zaXRvcnkxOTUyOTA2NDE="
+  category = "Announcements"
+  categoryID = "DIC_kwDOC6PmEc4DBP-j"
+  theme = "preferred_color_scheme"
+  mapping = "pathname"
+  reactionsEnabled = "1"
+  inputPosition = "top"
+  lang = "en"
+
 [taxonomies]
   category = "categories"
   series = "series"
