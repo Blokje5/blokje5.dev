@@ -4,6 +4,9 @@
 # Hugo default output directory
 /public
 
+# Hugo resource cache (regenerated on build)
+/resources/_gen/
+
 ## OS Files
 # Windows
 Thumbs.db

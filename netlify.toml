@@ -2,6 +2,9 @@
 publish = "public"
 command = "hugo --config hugo.toml --gc --minify --baseURL $URL"
 
+[build.environment]
+HUGO_VERSION = "0.164.0"
+
 [context.deploy-preview]
 command = "hugo --config hugo.toml --gc --minify --buildFuture --baseURL $DEPLOY_URL"
 

@@ -1,31 +1,25 @@
-baseurl = "https://www.blokje5.dev"
+baseURL = "https://www.blokje5.dev"
 title = "blokje5.dev"
 theme = "hugo-coder"
-languagecode = "en"
-defaultcontentlanguage = "en"
-canonifyurls = true
-favicon_32 = "/img/favicon-32x32.png"
-favicon_16 = "/img/favicon-16x16.png"
+locale = "en"
+defaultContentLanguage = "en"
 
-pygmentsstyle = "solarized-dark"
-pygmentscodefences = true
-pygmentscodefencesguesssyntax = true
-
-[markup.highlight]
-style = "github-dark"
-
-[permalinks]
-  blog = "/:filename/"
+[markup]
+  [markup.highlight]
+    style = "github-dark"
+    guessSyntax = true
+  [markup.goldmark.renderer]
+    unsafe = true
 
 [params]
-    author = "Lennard Eijsackers"
-    info = "Data Engineer"
-    description = "Lennard Eijsackers developer blog"
-    keywords = "blog,developer,personal"
-    hidecredits = false
-    hidecopyright = false
-    rtl = false
-    math = false
+  author = "Lennard Eijsackers"
+  info = "Data Engineer"
+  description = "Lennard Eijsackers developer blog"
+  keywords = "blog,developer,personal"
+  dateFormat = "January 2, 2006"
+  colorScheme = "auto"
+  favicon_32 = "/img/favicon-32x32.png"
+  favicon_16 = "/img/favicon-16x16.png"
 
 [taxonomies]
   category = "categories"
@@ -34,22 +28,22 @@ style = "github-dark"
   author = "authors"
 
 [[params.social]]
-    name = "Github"
-    icon = "fab fa-github fa-2x"
-    weight = 1
-    url = "https://github.com/Blokje5/"
+  name = "Github"
+  icon = "fa-brands fa-github fa-2x"
+  weight = 1
+  url = "https://github.com/Blokje5/"
 [[params.social]]
-    name = "Twitter"
-    icon = "fab fa-twitter fa-2x"
-    weight = 3
-    url = "https://twitter.com/LennardNL/"
+  name = "X"
+  icon = "fa-brands fa-x-twitter fa-2x"
+  weight = 2
+  url = "https://twitter.com/LennardNL/"
 [[params.social]]
-    name = "Stackoverflow"
-    icon = "fab fa-stack-overflow fa-2x"
-    weight = 3
-    url = "https://stackoverflow.com/users/9741769/blokje5/"
+  name = "Stackoverflow"
+  icon = "fa-brands fa-stack-overflow fa-2x"
+  weight = 3
+  url = "https://stackoverflow.com/users/9741769/blokje5/"
 [[params.social]]
-    name = "Linkedin"
-    icon = "fab fa-linkedin fa-2x"
-    weight = 3
-    url = "https://www.linkedin.com/in/lennard-eijsackers/"
+  name = "Linkedin"
+  icon = "fa-brands fa-linkedin fa-2x"
+  weight = 4
+  url = "https://www.linkedin.com/in/lennard-eijsackers/"
